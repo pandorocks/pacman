@@ -6,7 +6,8 @@ module Pacman
   class BoardComponent < Charming::Component
     WALL_STYLE = Charming::UI.style.foreground("#2121de")
     PELLET_STYLE = Charming::UI.style.foreground("#ffb8ae")
-    POWER_STYLE = Charming::UI.style.foreground("#ffb8ae").bold
+    CHERRY_STYLE = Charming::UI.style.foreground("#ff2121").bold
+    STEM_STYLE = Charming::UI.style.foreground("#21c821")
     PLAYER_STYLE = Charming::UI.style.foreground("#ffff00").bold
     FRIGHTENED_STYLE = Charming::UI.style.foreground("#2121de").bold
     EATEN_STYLE = Charming::UI.style.foreground("#ffffff")
@@ -45,6 +46,7 @@ module Pacman
       return ghost_cell(position, subrow) if ghost_at(position)
       return PLAYER_STYLE.render(player_sprite[subrow]) if world.player.position == position
       return WALL_STYLE.render("#" * cell_width) if maze.wall?(position)
+      return cherry_cell(subrow) if world.pellets.power?(position)
       return pellet_cell(position, subrow) if middle?(subrow)
 
       blank
@@ -54,11 +56,21 @@ module Pacman
       @player_sprite ||= Sprites.player(scale: scale, direction: world.player.direction)
     end
 
-    def pellet_cell(position, subrow)
-      return POWER_STYLE.render(("o" * scale).center(cell_width)) if world.pellets.power?(position)
+    def pellet_cell(position, _subrow)
       return PELLET_STYLE.render(".".center(cell_width)) if world.pellets.include?(position)
 
       blank
+    end
+
+    def cherry_cell(subrow)
+      Sprites.cherry(scale: scale)[subrow].chars.map { |char| cherry_char(char) }.join
+    end
+
+    def cherry_char(char)
+      return char if char == " "
+      return STEM_STYLE.render(char) if char == "│"
+
+      CHERRY_STYLE.render(char)
     end
 
     def middle?(subrow)

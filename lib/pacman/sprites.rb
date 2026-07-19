@@ -28,6 +28,12 @@ module Pacman
       sprite.draw(texture: "▒") { |y, x| sprite.ghost_body?(y, x) && !sprite.eye?(y, x) }
     end
 
+    def self.cherry(scale:)
+      return ["● "] if scale == 1
+
+      new(scale).cherry
+    end
+
     def self.eaten(scale:)
       return ["▀▀"] if scale == 1
 
@@ -48,6 +54,11 @@ module Pacman
           cell_char(yield(row * 2, col), yield(row * 2 + 1, col), texture)
         end.join
       end
+    end
+
+    def cherry
+      body = draw { |y, x| berry?(y, x) }
+      add_stems(body)
     end
 
     def pacman?(y, x, direction)
@@ -76,6 +87,30 @@ module Pacman
     private
 
     attr_reader :scale, :pixels, :center, :radius
+
+    BERRY_RADIUS = 0.42
+    BERRY_ROW = 1.4
+    BERRY_COLS = [0.55, 1.45].freeze
+
+    def berry?(y, x)
+      r = scale * BERRY_RADIUS
+      BERRY_COLS.any? do |col|
+        ((y - (scale * BERRY_ROW))**2) + ((x - (scale * col))**2) <= r**2
+      end
+    end
+
+    def add_stems(lines)
+      stem_rows = lines.take_while { |line| line.strip.empty? }.length
+      (0...stem_rows).each do |row|
+        t = (row + 1).to_f / (stem_rows + 1)
+        stem_columns(t).each { |col| lines[row][col] = "│" }
+      end
+      lines
+    end
+
+    def stem_columns(t)
+      BERRY_COLS.map { |col| (scale + (((scale * col) - scale) * t)).round }.uniq
+    end
 
     def cell_char(top, bottom, texture)
       return texture_char(top, bottom, texture) if texture

@@ -16,7 +16,8 @@ RSpec.describe Pacman::Sprites do
           described_class.player(scale: k, direction: direction.left),
           described_class.ghost(scale: k),
           described_class.frightened(scale: k),
-          described_class.eaten(scale: k)
+          described_class.eaten(scale: k),
+          described_class.cherry(scale: k)
         ].each do |lines|
           expect(lines.length).to eq(k)
           expect(lines.map(&:length).uniq).to eq([k * 2])
@@ -60,6 +61,22 @@ RSpec.describe Pacman::Sprites do
       expect(described_class.frightened(scale: 1)).to eq(["▒▒"])
       expect(described_class.frightened(scale: 3).join).to include("▒")
       expect(described_class.frightened(scale: 3).join).not_to include("█")
+    end
+  end
+
+  describe ".cherry" do
+    it "is a single berry at scale 1" do
+      expect(described_class.cherry(scale: 1)).to eq(["● "])
+    end
+
+    it "grows berries below green-able stems at larger scales" do
+      [2, 3, 4].each do |k|
+        lines = described_class.cherry(scale: k)
+
+        expect(lines.first).to include("│")
+        expect(lines.first).not_to match(/[█▀▄]/)
+        expect(lines.last).to match(/[█▀▄]/)
+      end
     end
   end
 

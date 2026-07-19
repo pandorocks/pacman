@@ -23,8 +23,8 @@ RSpec.describe Pacman::BoardComponent do
 
     expect(lines.length).to eq(10)
     expect(lines[0]).to eq("#" * 20)
-    expect(lines[2]).to eq("####▄██  .   oo ####")
-    expect(lines[3]).to eq("####▀██         ####")
+    expect(lines[2]).to eq("####▄██  .    │ ####")
+    expect(lines[3]).to eq("####▀██      █ █####")
   end
 
   it "renders ghosts, drawing frightened ones differently" do
@@ -48,12 +48,12 @@ RSpec.describe Pacman::BoardComponent do
     expect(frightened[3]).to eq("      ▒▒  ")
   end
 
-  it "renders walls, pellets, power pellets, and the player as two-char cells" do
+  it "renders walls, pellets, cherry power pellets, and the player as two-char cells" do
     lines = strip_ansi(described_class.new(world: world).render).split("\n")
 
     expect(lines).to eq([
       "##########",
-      "##██. o ##",
+      "##██. ● ##",
       "##  ##  ##",
       "          ",
       "##########"

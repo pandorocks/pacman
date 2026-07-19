@@ -18,7 +18,7 @@ bundle exec pacman
 - **Enter** on the title screen starts a game.
 - Steer with the **arrow keys** or **WASD** — turns are buffered and taken at the
   next opening, like the arcade.
-- Eat every pellet to clear the level; levels get faster. Power pellets (`o`)
+- Eat every pellet to clear the level; levels get faster. Power pellets — drawn as cherries — 
   frighten the ghosts — they turn blue and dithered — so you can eat them for
   combo bonuses (200/400/800/1600); eaten ghosts race home as floating eyes.
 - The board scales to your terminal. At larger sizes the actors are drawn as

@@ -15,5 +15,8 @@ module Pacman
     command "Theme", :open_theme_palette
     command "Close palette", :close_command_palette
     command "Quit app", :quit
+    command "Game" do
+      navigate_to "/game"
+    end
   end
 end

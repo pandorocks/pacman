@@ -2,4 +2,5 @@
 
 Pacman::Application.routes do
   root "home#show"
+  screen "/game", to: "game#show", title: "Game"
 end

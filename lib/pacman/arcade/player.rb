@@ -6,8 +6,16 @@ module Pacman
       attr_reader :position, :direction
 
       def initialize(position:, direction:)
+        @start = position
+        @initial_direction = direction
         @position = position
         @direction = direction
+      end
+
+      def respawn
+        @position = @start
+        @direction = @initial_direction
+        @queued_turn = nil
       end
 
       def queue_turn(new_direction)

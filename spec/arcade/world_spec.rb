@@ -68,6 +68,80 @@ RSpec.describe Pacman::Arcade::World do
     end
   end
 
+  describe "ghosts" do
+    def build_world(ghosts:, pellets: Pacman::Arcade::PelletField.new(pellets: [], powers: []))
+      described_class.new(
+        maze: maze,
+        player: player,
+        pellets: pellets,
+        scoreboard: scoreboard,
+        ghosts: ghosts,
+        schedule: Pacman::Arcade::ModeSchedule.new(
+          scatter_ticks: 100, chase_ticks: 1, frightened_ticks: 10
+        ),
+        rng: Random.new(3)
+      )
+    end
+
+    def ghost_at(row, col)
+      Pacman::Arcade::Ghost.new(
+        spawn: Pacman::Arcade::Spawn.new(start: pos(row, col), corner: pos(3, 4)),
+        brain: Pacman::Arcade::Brains::Chase.new
+      )
+    end
+
+    it "moves ghosts every second tick" do
+      ghost = ghost_at(3, 1)
+      world = build_world(ghosts: [ghost])
+
+      world.tick
+      expect(ghost.position).to eq(pos(3, 1))
+
+      world.tick
+      expect(ghost.position).to eq(pos(3, 2))
+    end
+
+    it "frightens ghosts when the player eats a power pellet" do
+      ghost = ghost_at(3, 1)
+      world = build_world(
+        ghosts: [ghost],
+        pellets: Pacman::Arcade::PelletField.new(pellets: [], powers: [pos(1, 2)])
+      )
+
+      events = world.tick
+
+      expect(events).to include(:power_pellet)
+      expect(ghost).to be_edible
+    end
+
+    it "costs a life and resets positions when a hungry ghost catches the player" do
+      ghost = ghost_at(1, 2)
+      world = build_world(ghosts: [ghost])
+
+      events = world.tick
+
+      expect(events).to include(:death)
+      expect(world.lives).to eq(2)
+      expect(player.position).to eq(pos(1, 1))
+      expect(ghost.position).to eq(pos(1, 2))
+    end
+
+    it "devours a frightened ghost for bonus points" do
+      ghost = ghost_at(1, 3)
+      world = build_world(
+        ghosts: [ghost],
+        pellets: Pacman::Arcade::PelletField.new(pellets: [], powers: [pos(1, 2)])
+      )
+
+      world.tick
+      events = world.tick
+
+      expect(events).to include(:ghost_eaten)
+      expect(ghost).to be_eaten
+      expect(world.score).to eq(250)
+    end
+  end
+
   describe "#queue_turn" do
     it "buffers a turn that the player takes at the next opening" do
       world.queue_turn(direction.down)

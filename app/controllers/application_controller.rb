@@ -18,5 +18,8 @@ module Pacman
     command "Game" do
       navigate_to "/game"
     end
+    command "GameOver" do
+      navigate_to "/game_over"
+    end
   end
 end

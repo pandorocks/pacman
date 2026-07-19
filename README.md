@@ -10,7 +10,7 @@ terminal UI framework.
 Run it with:
 
 ```sh
-bundle exec pacman
+bundle exec pacmanrb
 ```
 
 ## How to play

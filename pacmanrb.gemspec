@@ -3,14 +3,14 @@
 require_relative "lib/pacman/version"
 
 Gem::Specification.new do |spec|
-  spec.name = "pacman"
+  spec.name = "pacmanrb"
   spec.version = Pacman::VERSION
   spec.summary = "A Charming terminal user interface."
-  spec.authors = ["TODO: Your name"]
-  spec.email = ["TODO: Your email"]
+  spec.authors = ["Pando"]
+  spec.email = ["pandorocks@proton.me"]
   spec.files = Dir.glob("{app,config,db,exe,lib}/**/*") + %w[README.md]
   spec.bindir = "exe"
-  spec.executables = ["pacman"]
+  spec.executables = ["pacmanrb"]
   spec.require_paths = ["lib"]
   spec.required_ruby_version = ">= 4.0.0"
   spec.metadata["rubygems_mfa_required"] = "true"

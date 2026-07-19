@@ -9,6 +9,7 @@ module Pacman
     POWER_STYLE = Charming::UI.style.foreground("#ffb8ae").bold
     PLAYER_STYLE = Charming::UI.style.foreground("#ffff00").bold
     FRIGHTENED_STYLE = Charming::UI.style.foreground("#2121de").bold
+    EATEN_STYLE = Charming::UI.style.foreground("#ffffff")
     GHOST_STYLES = [
       Charming::UI.style.foreground("#ff0000").bold,
       Charming::UI.style.foreground("#ffb8de").bold,
@@ -41,12 +42,16 @@ module Pacman
     end
 
     def cell(position, subrow)
-      return ghost_cell(position) if ghost_at(position)
-      return PLAYER_STYLE.render(sprite("C")) if world.player.position == position
+      return ghost_cell(position, subrow) if ghost_at(position)
+      return PLAYER_STYLE.render(player_sprite[subrow]) if world.player.position == position
       return WALL_STYLE.render("#" * cell_width) if maze.wall?(position)
       return pellet_cell(position, subrow) if middle?(subrow)
 
       blank
+    end
+
+    def player_sprite
+      @player_sprite ||= Sprites.player(scale: scale, direction: world.player.direction)
     end
 
     def pellet_cell(position, subrow)
@@ -64,16 +69,12 @@ module Pacman
       " " * cell_width
     end
 
-    def sprite(char)
-      (char * scale).center(cell_width)
-    end
-
-    def ghost_cell(position)
+    def ghost_cell(position, subrow)
       ghost = ghost_at(position)
-      return FRIGHTENED_STYLE.render(sprite("m")) if ghost.edible?
-      return sprite("~") if ghost.eaten?
+      return FRIGHTENED_STYLE.render(Sprites.frightened(scale: scale)[subrow]) if ghost.edible?
+      return EATEN_STYLE.render(Sprites.eaten(scale: scale)[subrow]) if ghost.eaten?
 
-      ghost_style(ghost).render(sprite("M"))
+      ghost_style(ghost).render(Sprites.ghost(scale: scale)[subrow])
     end
 
     def ghost_at(position)

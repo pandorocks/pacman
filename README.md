@@ -1,7 +1,7 @@
 # Pacman
 
 A Pacman arcade clone built with the [Charming](https://github.com/pandorocks/charming)
-terminal UI framework, as an end-to-end exercise of the framework and its generators.
+terminal UI framework.
 
 ## Screenshots
 <img width="1256" height="1065" alt="image" src="https://github.com/user-attachments/assets/72cc474b-f54d-40aa-b622-6e203251e0ca" />

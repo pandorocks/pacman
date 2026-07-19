@@ -23,6 +23,20 @@ RSpec.describe Pacman::GameOverController do
     end
   end
 
+  describe "high score table" do
+    it "lists the five best scores, best first" do
+      [100, 200, 300, 400, 500, 600].each do |score|
+        Pacman::HighScore.create!(name: "PLAYER", score: score)
+      end
+
+      body = strip_ansi(controller.dispatch(:show).body)
+
+      expect(body).to include("600")
+      expect(body).not_to include("100")
+      expect(body.index("600")).to be < body.index("200")
+    end
+  end
+
   describe "#restart" do
     it "starts a fresh game" do
       response = controller.dispatch(:restart)

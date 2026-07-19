@@ -4,13 +4,24 @@ module Pacman
   module GameOver
     class ShowView < Charming::View
       def render
-        column(banner, summary, hint, gap: 1)
+        column(banner, summary, high_score_table, hint, gap: 1)
       end
 
       private
 
       def banner
         text "GAME OVER", style: theme.title.bold
+      end
+
+      def high_score_table
+        return "" if high_scores.empty?
+
+        column(
+          text("HIGH SCORES", style: theme.title),
+          *high_scores.map.with_index(1) do |entry, rank|
+            text("#{rank}. #{entry.name}  #{entry.score}", style: theme.info)
+          end
+        )
       end
 
       def summary

@@ -8,6 +8,7 @@ module Pacman
     def show
       render :show,
         game_over: game_over,
+        high_scores: HighScore.top(5).to_a,
         palette: command_palette
     end
 

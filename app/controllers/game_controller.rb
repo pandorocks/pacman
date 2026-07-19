@@ -40,6 +40,7 @@ module Pacman
       summary = state(:game_over, GameOverState)
       summary.score = world.score
       summary.level = world.level
+      HighScore.create!(name: "PLAYER", score: world.score)
       game.world = nil
       navigate_to "/game_over"
     end

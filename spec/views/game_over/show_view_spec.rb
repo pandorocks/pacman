@@ -9,6 +9,7 @@ RSpec.describe Pacman::GameOver::ShowView do
     it "shows the outcome with score and level" do
       view = described_class.new(
         game_over: Pacman::GameOverState.new(score: 990, level: 3),
+        high_scores: [],
         theme: Pacman::Application.new.theme
       )
 

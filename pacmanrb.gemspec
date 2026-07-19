@@ -8,7 +8,9 @@ Gem::Specification.new do |spec|
   spec.summary = "A Charming terminal user interface."
   spec.authors = ["Pando"]
   spec.email = ["pandorocks@proton.me"]
-  spec.files = Dir.glob("{app,config,db,exe,lib}/**/*") + %w[README.md]
+  spec.homepage = "https://charming.sh/docs/examples/pacman/"
+  spec.license = "MIT"
+  spec.files = Dir.glob("{app,config,db,exe,lib}/**/*") + %w[README.md LICENSE.txt]
   spec.bindir = "exe"
   spec.executables = ["pacmanrb"]
   spec.require_paths = ["lib"]

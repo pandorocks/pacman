@@ -18,6 +18,15 @@ RSpec.describe Pacman::BoardComponent do
     )
   end
 
+  it "scales each cell into a block when given a scale factor" do
+    lines = strip_ansi(described_class.new(world: world, scale: 2).render).split("\n")
+
+    expect(lines.length).to eq(10)
+    expect(lines[0]).to eq("#" * 20)
+    expect(lines[2]).to eq("#### CC  .   oo ####")
+    expect(lines[3]).to eq("#### CC         ####")
+  end
+
   it "renders ghosts, drawing frightened ones differently" do
     ghost = Pacman::Arcade::Ghost.new(
       spawn: Pacman::Arcade::Spawn.new(start: pos(3, 3), corner: pos(1, 1)),

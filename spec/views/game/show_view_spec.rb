@@ -15,6 +15,20 @@ RSpec.describe Pacman::Game::ShowView do
       expect(view.render).to include("Terminal too small")
     end
 
+    it "scales the board up and centers it on a large screen" do
+      view = described_class.new(
+        world: Pacman::Arcade::World.classic,
+        screen: Charming::Screen.new(width: 100, height: 40)
+      )
+
+      lines = strip_ansi(view.render).split("\n")
+
+      expect(lines.length).to eq(40)
+      wall_line = lines.find { |line| line.include?("#" * 76) }
+      expect(wall_line).not_to be_nil
+      expect(wall_line.index("#")).to eq(12)
+    end
+
     it "stacks the HUD above the maze board" do
       view = described_class.new(world: Pacman::Arcade::World.classic)
 

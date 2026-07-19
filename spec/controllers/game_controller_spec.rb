@@ -47,13 +47,16 @@ RSpec.describe Pacman::GameController do
     )
   end
 
+  # Small enough that the doomed mini maze renders at zoom 1, keeping pace 1.
+  let(:tiny_screen) { Charming::Screen.new(width: 12, height: 5) }
+
   describe "losing the last life" do
     it "navigates to the game over screen carrying the final score" do
       doomed = doomed_world
       application.session[:states] = {game: Pacman::GameState.new(world: doomed)}
 
       responses = 3.times.map do
-        described_class.new(application: application).dispatch(:advance)
+        described_class.new(application: application, screen: tiny_screen).dispatch(:advance)
       end
 
       expect(responses.last.navigate?).to be(true)
@@ -62,12 +65,29 @@ RSpec.describe Pacman::GameController do
     end
   end
 
+  describe "movement pacing at high zoom" do
+    it "moves the world every second timer pulse on a large screen" do
+      big_screen = Charming::Screen.new(width: 200, height: 50)
+      start = Pacman::Arcade::World.classic.player.position
+
+      first = described_class.new(application: application, screen: big_screen).dispatch(:advance)
+      world = application.session[:states][:game].world
+      expect(world.player.position).to eq(start)
+      expect(first.body).to eq("")
+
+      described_class.new(application: application, screen: big_screen).dispatch(:advance)
+      expect(world.player.position).not_to eq(start)
+    end
+  end
+
   describe "high scores" do
     it "records the final score when the game ends" do
       doomed = doomed_world
       application.session[:states] = {game: Pacman::GameState.new(world: doomed)}
 
-      3.times { described_class.new(application: application).dispatch(:advance) }
+      3.times do
+        described_class.new(application: application, screen: tiny_screen).dispatch(:advance)
+      end
 
       expect(Pacman::HighScore.count).to eq(1)
       expect(Pacman::HighScore.first.score).to eq(doomed.score)

@@ -20,6 +20,8 @@ module Pacman
     end
 
     def advance
+      return unless movement_pulse?
+
       world.tick
       return finish_game if world.over?
 
@@ -35,6 +37,13 @@ module Pacman
     def turn_right = turn(Arcade::Direction.right)
 
     private
+
+    # Skips timer pulses at high zoom so on-screen speed stays playable.
+    def movement_pulse?
+      game.pulse += 1
+      pace = BoardScale.new(screen: screen, maze: world.maze).pace
+      (game.pulse % pace).zero?
+    end
 
     def finish_game
       summary = state(:game_over, GameOverState)

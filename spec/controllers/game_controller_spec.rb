@@ -26,6 +26,38 @@ RSpec.describe Pacman::GameController do
     end
   end
 
+  describe "losing the last life" do
+    it "navigates to the game over screen carrying the final score" do
+      doomed = Pacman::Arcade::World.new(
+        maze: Pacman::Arcade::Maze.new("#####\n#...#\n#####"),
+        player: Pacman::Arcade::Player.new(
+          position: Pacman::Arcade::Position.new(row: 1, col: 1),
+          direction: Pacman::Arcade::Direction.right
+        ),
+        pellets: Pacman::Arcade::PelletField.new(pellets: [], powers: []),
+        scoreboard: Pacman::Arcade::Scoreboard.new,
+        ghosts: [
+          Pacman::Arcade::Ghost.new(
+            spawn: Pacman::Arcade::Spawn.new(
+              start: Pacman::Arcade::Position.new(row: 1, col: 2),
+              corner: Pacman::Arcade::Position.new(row: 1, col: 3)
+            ),
+            brain: Pacman::Arcade::Brains::Chase.new
+          )
+        ]
+      )
+      application.session[:states] = {game: Pacman::GameState.new(world: doomed)}
+
+      responses = 3.times.map do
+        described_class.new(application: application).dispatch(:advance)
+      end
+
+      expect(responses.last.navigate?).to be(true)
+      expect(responses.last.path).to eq("/game_over")
+      expect(application.session[:states][:game_over].score).to eq(doomed.score)
+    end
+  end
+
   describe "turn actions" do
     it "queues a turn that survives into a fresh controller's next tick" do
       controller.dispatch(:turn_right)

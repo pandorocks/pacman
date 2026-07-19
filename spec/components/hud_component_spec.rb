@@ -15,4 +15,11 @@ RSpec.describe Pacman::HudComponent do
     expect(rendered).to include("SCORE 10")
     expect(rendered).to include("PELLETS #{world.pellets.remaining}")
   end
+
+  it "shows remaining lives and the current level" do
+    rendered = strip_ansi(described_class.new(world: world).render)
+
+    expect(rendered).to include("LIVES 3")
+    expect(rendered).to include("LEVEL 1")
+  end
 end

@@ -10,7 +10,7 @@ module Pacman
       FRIGHTENED_STRIDE = 3
       STARTING_LIVES = 3
 
-      attr_reader :maze, :player, :pellets, :ghosts, :navigator, :rng, :lives
+      attr_reader :maze, :player, :pellets, :ghosts, :navigator, :rng, :lives, :level
 
       def self.classic(rng: Random.new)
         maze = Maze.new(Layouts::CLASSIC)
@@ -52,15 +52,25 @@ module Pacman
         @rng = rng
         @navigator = Navigator.new(maze)
         @lives = STARTING_LIVES
+        @level = 1
         @ticks = 0
       end
 
+      def over?
+        lives <= 0
+      end
+
       def tick
+        return [] if over?
+
         @ticks += 1
         events = []
         events.concat(advance_schedule)
         player.advance(maze)
         events.concat(eat_at(player.position))
+        events.concat(resolve_collisions)
+        return events if events.include?(:death)
+
         advance_ghosts
         events.concat(resolve_collisions)
       end
@@ -89,7 +99,17 @@ module Pacman
 
         scoreboard.public_send(:"#{kind}!")
         frighten_all if kind == :power
-        [EATEN_EVENTS.fetch(kind)]
+        events = [EATEN_EVENTS.fetch(kind)]
+        events.concat(clear_level) if pellets.empty?
+        events
+      end
+
+      def clear_level
+        @level += 1
+        @pellets = PelletField.new(pellets: maze.pellet_positions, powers: maze.power_positions)
+        player.respawn
+        ghosts.each(&:respawn)
+        [:level_clear]
       end
 
       def frighten_all
@@ -112,8 +132,12 @@ module Pacman
       end
 
       def moves_this_tick?(ghost)
-        stride = ghost.edible? ? FRIGHTENED_STRIDE : GHOST_STRIDE
-        (@ticks % stride).zero?
+        (@ticks % stride(ghost)).zero?
+      end
+
+      def stride(ghost)
+        base = (level == 1) ? GHOST_STRIDE : 1
+        ghost.edible? ? base + 1 : base
       end
 
       def resolve_collisions

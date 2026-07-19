@@ -21,8 +21,9 @@ RSpec.describe Pacman::Arcade::World do
     Pacman::Arcade::Player.new(position: pos(1, 1), direction: direction.right)
   end
 
+  # The far pellet at (3,3) keeps the field from emptying mid-test (which would clear the level).
   let(:pellets) do
-    Pacman::Arcade::PelletField.new(pellets: [pos(1, 2)], powers: [pos(1, 3)])
+    Pacman::Arcade::PelletField.new(pellets: [pos(1, 2), pos(3, 3)], powers: [pos(1, 3)])
   end
 
   let(:scoreboard) { Pacman::Arcade::Scoreboard.new }
@@ -50,7 +51,7 @@ RSpec.describe Pacman::Arcade::World do
       expect(player.position).to eq(pos(1, 2))
       expect(events).to include(:pellet_eaten)
       expect(world.score).to eq(10)
-      expect(pellets.remaining).to eq(1)
+      expect(pellets.remaining).to eq(2)
     end
 
     it "reports a power pellet when the player lands on one" do
@@ -68,28 +69,28 @@ RSpec.describe Pacman::Arcade::World do
     end
   end
 
+  def build_world(ghosts:, pellets: Pacman::Arcade::PelletField.new(pellets: [], powers: []))
+    described_class.new(
+      maze: maze,
+      player: player,
+      pellets: pellets,
+      scoreboard: scoreboard,
+      ghosts: ghosts,
+      schedule: Pacman::Arcade::ModeSchedule.new(
+        scatter_ticks: 100, chase_ticks: 1, frightened_ticks: 10
+      ),
+      rng: Random.new(3)
+    )
+  end
+
+  def ghost_at(row, col)
+    Pacman::Arcade::Ghost.new(
+      spawn: Pacman::Arcade::Spawn.new(start: pos(row, col), corner: pos(3, 4)),
+      brain: Pacman::Arcade::Brains::Chase.new
+    )
+  end
+
   describe "ghosts" do
-    def build_world(ghosts:, pellets: Pacman::Arcade::PelletField.new(pellets: [], powers: []))
-      described_class.new(
-        maze: maze,
-        player: player,
-        pellets: pellets,
-        scoreboard: scoreboard,
-        ghosts: ghosts,
-        schedule: Pacman::Arcade::ModeSchedule.new(
-          scatter_ticks: 100, chase_ticks: 1, frightened_ticks: 10
-        ),
-        rng: Random.new(3)
-      )
-    end
-
-    def ghost_at(row, col)
-      Pacman::Arcade::Ghost.new(
-        spawn: Pacman::Arcade::Spawn.new(start: pos(row, col), corner: pos(3, 4)),
-        brain: Pacman::Arcade::Brains::Chase.new
-      )
-    end
-
     it "moves ghosts every second tick" do
       ghost = ghost_at(3, 1)
       world = build_world(ghosts: [ghost])
@@ -105,7 +106,7 @@ RSpec.describe Pacman::Arcade::World do
       ghost = ghost_at(3, 1)
       world = build_world(
         ghosts: [ghost],
-        pellets: Pacman::Arcade::PelletField.new(pellets: [], powers: [pos(1, 2)])
+        pellets: Pacman::Arcade::PelletField.new(pellets: [pos(3, 3)], powers: [pos(1, 2)])
       )
 
       events = world.tick
@@ -130,7 +131,7 @@ RSpec.describe Pacman::Arcade::World do
       ghost = ghost_at(1, 3)
       world = build_world(
         ghosts: [ghost],
-        pellets: Pacman::Arcade::PelletField.new(pellets: [], powers: [pos(1, 2)])
+        pellets: Pacman::Arcade::PelletField.new(pellets: [pos(3, 3)], powers: [pos(1, 2)])
       )
 
       world.tick
@@ -139,6 +140,39 @@ RSpec.describe Pacman::Arcade::World do
       expect(events).to include(:ghost_eaten)
       expect(ghost).to be_eaten
       expect(world.score).to eq(250)
+    end
+  end
+
+  describe "losing" do
+    it "ends the game when the last life is lost and goes inert" do
+      world = build_world(ghosts: [ghost_at(1, 2)])
+
+      3.times { world.tick }
+
+      expect(world).to be_over
+      expect(world.lives).to eq(0)
+      expect(world.tick).to eq([])
+    end
+  end
+
+  describe "levels" do
+    it "clears the level when the last pellet is eaten, refills the maze, and speeds ghosts up" do
+      ghost = ghost_at(3, 1)
+      world = build_world(
+        ghosts: [ghost],
+        pellets: Pacman::Arcade::PelletField.new(pellets: [pos(1, 2)], powers: [])
+      )
+
+      events = world.tick
+
+      expect(events).to include(:level_clear)
+      expect(world.level).to eq(2)
+      expect(world.pellets.remaining).to be > 0
+      expect(world.player.position).to eq(pos(1, 1))
+
+      world.tick
+
+      expect(ghost.position).not_to eq(pos(3, 1))
     end
   end
 

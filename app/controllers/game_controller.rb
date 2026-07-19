@@ -21,6 +21,8 @@ module Pacman
 
     def advance
       world.tick
+      return finish_game if world.over?
+
       show
     end
 
@@ -33,6 +35,14 @@ module Pacman
     def turn_right = turn(Arcade::Direction.right)
 
     private
+
+    def finish_game
+      summary = state(:game_over, GameOverState)
+      summary.score = world.score
+      summary.level = world.level
+      game.world = nil
+      navigate_to "/game_over"
+    end
 
     def turn(direction)
       world.queue_turn(direction)

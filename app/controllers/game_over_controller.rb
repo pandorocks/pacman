@@ -2,10 +2,18 @@
 
 module Pacman
   class GameOverController < ApplicationController
+    key "r", :restart, scope: :global
+    key "enter", :restart, scope: :global
+
     def show
       render :show,
         game_over: game_over,
         palette: command_palette
+    end
+
+    def restart
+      state(:game, GameState).world = nil
+      navigate_to "/game"
     end
 
     private

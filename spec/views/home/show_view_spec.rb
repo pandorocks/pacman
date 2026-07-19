@@ -3,14 +3,19 @@
 require "pacman"
 
 RSpec.describe Pacman::Home::ShowView do
+  def strip_ansi(string) = string.gsub(/\e\[[0-9;]*m/, "")
+
   describe "#render" do
-    it "renders the state title" do
+    it "shows the title art and how to start" do
       view = described_class.new(
-        home: double(title: "Pacman"),
+        home: Pacman::HomeState.new,
         theme: Pacman::Application.new.theme
       )
 
-      expect(view.render).to include("Pacman")
+      rendered = strip_ansi(view.render)
+
+      expect(rendered).to include("PAC-MAN")
+      expect(rendered).to include("Enter")
     end
   end
 end

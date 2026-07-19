@@ -5,6 +5,16 @@ module Pacman
     class World
       attr_reader :maze, :player, :pellets
 
+      def self.classic
+        maze = Maze.new(Layouts::CLASSIC)
+        new(
+          maze: maze,
+          player: Player.new(position: maze.player_start, direction: Direction.left),
+          pellets: PelletField.new(pellets: maze.pellet_positions, powers: maze.power_positions),
+          scoreboard: Scoreboard.new
+        )
+      end
+
       def initialize(maze:, player:, pellets:, scoreboard:)
         @maze = maze
         @player = player

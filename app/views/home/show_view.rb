@@ -3,18 +3,35 @@
 module Pacman
   module Home
     class ShowView < Charming::View
+      LOGO = <<~ART
+        ██████╗  █████╗  ██████╗      ███╗   ███╗ █████╗ ███╗   ██╗
+        ██╔══██╗██╔══██╗██╔════╝█████╗████╗ ████║██╔══██╗████╗  ██║
+        ██████╔╝███████║██║     ╚════╝██╔████╔██║███████║██╔██╗ ██║
+        ██╔═══╝ ██╔══██║██║           ██║╚██╔╝██║██╔══██║██║╚██╗██║
+        ██║     ██║  ██║╚██████╗      ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+        ╚═╝     ╚═╝  ╚═╝ ╚═════╝      ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝
+      ART
+
       def render
-        column(title_line, help_line, gap: 1)
+        column(logo_block, subtitle, start_hint, controls_hint, gap: 1)
       end
 
       private
 
-      def title_line
-        text home.title, style: theme.title
+      def logo_block
+        text LOGO.chomp, style: theme.title
       end
 
-      def help_line
-        text "Press ctrl+p for commands, q to quit.", style: theme.muted
+      def subtitle
+        text "PAC-MAN — a Charming arcade clone", style: theme.info
+      end
+
+      def start_hint
+        text "Press Enter to start", style: theme.title.bold
+      end
+
+      def controls_hint
+        text "Arrows or WASD to steer · q to quit", style: theme.muted
       end
     end
   end

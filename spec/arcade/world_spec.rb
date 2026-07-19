@@ -31,6 +31,18 @@ RSpec.describe Pacman::Arcade::World do
     described_class.new(maze: maze, player: player, pellets: pellets, scoreboard: scoreboard)
   end
 
+  describe ".classic" do
+    it "assembles a world from the classic layout with the player at its start" do
+      world = described_class.classic
+
+      expect(world.player.position).to eq(world.maze.player_start)
+      expect(world.pellets.remaining).to eq(
+        world.maze.pellet_positions.size + world.maze.power_positions.size
+      )
+      expect(world.score).to eq(0)
+    end
+  end
+
   describe "#tick" do
     it "moves the player and reports an eaten pellet" do
       events = world.tick

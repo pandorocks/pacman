@@ -23,6 +23,14 @@ module Pacman
         pellets.size + powers.size
       end
 
+      def include?(position)
+        pellets.include?(position) || powers.include?(position)
+      end
+
+      def power?(position)
+        powers.include?(position)
+      end
+
       private
 
       attr_reader :pellets, :powers

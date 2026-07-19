@@ -14,4 +14,13 @@ RSpec.describe Pacman::HomeController do
       expect(response).to respond_to(:body)
     end
   end
+
+  describe "#start_game" do
+    it "navigates to the game screen" do
+      response = controller.dispatch(:start_game)
+
+      expect(response.navigate?).to be(true)
+      expect(response.path).to eq("/game")
+    end
+  end
 end

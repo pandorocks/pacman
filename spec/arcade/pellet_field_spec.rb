@@ -25,6 +25,18 @@ RSpec.describe Pacman::Arcade::PelletField do
     end
   end
 
+  describe "#include? / #power?" do
+    it "answers what remains at a position" do
+      expect(field.include?(pos(1, 1))).to be(true)
+      expect(field.power?(pos(2, 1))).to be(true)
+      expect(field.power?(pos(1, 1))).to be(false)
+
+      field.eat(pos(1, 1))
+
+      expect(field.include?(pos(1, 1))).to be(false)
+    end
+  end
+
   describe "#empty? / #remaining" do
     it "empties as everything gets eaten" do
       expect(field.remaining).to eq(3)

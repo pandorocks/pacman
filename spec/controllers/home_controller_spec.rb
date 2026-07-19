@@ -15,6 +15,15 @@ RSpec.describe Pacman::HomeController do
     end
   end
 
+  describe "chrome" do
+    it "renders full-bleed without a navigation sidebar" do
+      body = controller.dispatch(:show).body.gsub(/\e\[[0-9;]*m/, "")
+
+      expect(body).not_to include("tab focus")
+      expect(body).not_to include("╭")
+    end
+  end
+
   describe "#start_game" do
     it "navigates to the game screen" do
       response = controller.dispatch(:start_game)

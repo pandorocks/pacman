@@ -25,15 +25,15 @@ RSpec.describe Pacman::BoardScale do
   end
 
   describe "#pace" do
-    it "slows movement as the zoom grows so on-screen speed stays sane" do
+    it "keeps full speed at modest zooms and takes one gentle step down at high zoom" do
       expect(scale_for(80, 24).pace).to eq(1)
-      expect(scale_for(100, 40).pace).to eq(2)
+      expect(scale_for(100, 40).pace).to eq(1)
       expect(scale_for(200, 50).pace).to eq(2)
-      expect(scale_for(400, 80).pace).to eq(3)
     end
 
-    it "never slows below a playable cap however huge the terminal" do
-      expect(scale_for(2000, 400).pace).to eq(3)
+    it "never slows further however huge the terminal" do
+      expect(scale_for(400, 80).pace).to eq(2)
+      expect(scale_for(2000, 400).pace).to eq(2)
     end
   end
 end

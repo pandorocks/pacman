@@ -19,11 +19,12 @@ module Pacman
       factor < 1
     end
 
-    MAX_PACE = 3
+    SLOWDOWN_ZOOM = 3
 
-    # Timer pulses per movement tick: 1 at normal zoom, growing gently with it.
+    # Timer pulses per movement tick: full speed at modest zooms, one gentle
+    # halving once cells get big enough that motion would blur across the board.
     def pace
-      (1 + factor / 2).clamp(1, MAX_PACE)
+      (factor >= SLOWDOWN_ZOOM) ? 2 : 1
     end
 
     private

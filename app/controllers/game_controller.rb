@@ -2,8 +2,6 @@
 
 module Pacman
   class GameController < ApplicationController
-    layout false
-
     timer :tick, every: 0.12, action: :advance
 
     key "up", :turn_up, scope: :global

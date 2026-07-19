@@ -66,16 +66,18 @@ RSpec.describe Pacman::GameController do
   end
 
   describe "movement pacing at high zoom" do
-    it "moves the world every second timer pulse on a large screen" do
+    it "moves the world every second timer pulse on a large screen, skipping the repaint between" do
       big_screen = Charming::Screen.new(width: 200, height: 50)
+      tick = Charming::Events::TimerEvent.new(name: :tick, now: 0)
       start = Pacman::Arcade::World.classic.player.position
 
-      first = described_class.new(application: application, screen: big_screen).dispatch(:advance)
+      first = described_class.new(application: application, screen: big_screen, event: tick)
+        .dispatch_timer
       world = application.session[:states][:game].world
+      expect(first).to be_nil
       expect(world.player.position).to eq(start)
-      expect(first.body).to eq("")
 
-      described_class.new(application: application, screen: big_screen).dispatch(:advance)
+      described_class.new(application: application, screen: big_screen, event: tick).dispatch_timer
       expect(world.player.position).not_to eq(start)
     end
   end

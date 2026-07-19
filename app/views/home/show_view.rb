@@ -13,7 +13,11 @@ module Pacman
       ART
 
       def render
-        column(logo_block, subtitle, start_hint, controls_hint, gap: 1)
+        Charming::UI.center(
+          column(logo_block, subtitle, start_hint, controls_hint, gap: 1),
+          width: layout_screen.width,
+          height: layout_screen.height
+        )
       end
 
       private

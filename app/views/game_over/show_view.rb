@@ -4,7 +4,11 @@ module Pacman
   module GameOver
     class ShowView < Charming::View
       def render
-        column(banner, summary, high_score_table, hint, gap: 1)
+        Charming::UI.center(
+          column(banner, summary, high_score_table, hint, gap: 1),
+          width: layout_screen.width,
+          height: layout_screen.height
+        )
       end
 
       private

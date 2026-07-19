@@ -3,7 +3,6 @@
 module Pacman
   class ApplicationController < Charming::Controller
     layout Layouts::ApplicationLayout
-    focus_ring :sidebar, :content
 
     key "ctrl+p", :open_command_palette, scope: :global
     key "q", :quit, scope: :global
